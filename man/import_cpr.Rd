@@ -4,7 +4,7 @@
 \alias{import_cpr}
 \title{Import data from a NFSC-cpr spreadsheet}
 \usage{
-import_cpr(filename = list_files(full.names = TRUE)[1])
+import_cpr(filename)
 }
 \arguments{
 \item{filename}{char, the name of the file to read}

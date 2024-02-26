@@ -9,6 +9,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 This R package facilitates access and analysis of [NFSC](https://www.fisheries.noaa.gov/about/northeast-fisheries-science-center) [Continuous Plankton Recorder](https://en.wikipedia.org/wiki/Continuous_Plankton_Recorder) (CPR) data.  Data can imported from distrubuted [Excel](https://en.wikipedia.org/wiki/Microsoft_Excel) spreadsheets into data frames, [tibbles](https://tibble.tidyverse.org/) or [sf tables](https://r-spatial.github.io/sf/).
 
+>This dataset was obtained from [NOAA's NFSC](https://www.fisheries.noaa.gov/about/northeast-fisheries-science-center) on 20 January 2024 and might not represent the most up to date data. Please contact NOAA directly for the most recent data.
+
 ## Requirements
 
 + [R v4.1+](https://www.r-project.org/)
@@ -25,31 +27,39 @@ remotes::install_github("BigelowLab/nfsccrp")
 
 ## Usage
 
-### Data path
+### Read the data
 
-The data is quiet sizeable to store in a package, so we provide a means to set the data location outside of the package in a way that persists between R sessions.  You can set that path once and then forget it (or you can change it at anytime.)
+The dataset contains both zooplankton and phytoplankton data from the Mid-Atlantic Bight.  We should access to the zooplankton data, but it is easy to switch to phytoplankton.  We can read the data in its "raw" state (a wide table), pivoted into long form or as an sf object.
 
+####  Read as a wide table
 ```{r}
 library(nfsccpr)
-
-nfsccpr::set_path("/Users/ben/Library/CloudStorage/Dropbox/data/noaa/nmfs/cpr")
+x = read_cpr(name = "zooplankton", long = FALSE, form = "table")
+x
 ```
 
 
-Presumably, you have placed a data file in that directory.
-
-### List files in data path
-
+#### Read as a long table
 ```{r}
-ff = nfsccpr::list_files(full.names = TRUE)
-ff
+x = read_cpr(name = "zooplankton", long = TRUE, form = "table")
+x
 ```
 
-### Read a file
+#### Read as a long table cast to sf
+```{r}
+x = read_cpr(name = "zooplankton", long = TRUE, form = "sf")
+x
+```
 
-Reading the file yields once element for each included sheet.
+
+
+
+### Import a raw data file
+
+The data were shared as a large two-sheet Excel document. It's difficult to know if the format of the raw data file will remain as that distributed in January 2024.  Importing the one we were provided is encoded in a package function.  The package can be adapted for other formats but may require a small effort in adapting the code.
 
 ```{r}
+ff = "/Users/ben/Library/CloudStorage/Dropbox/data/noaa/nmfs/cpr/MAB CPR (Jan 20, 2024 update).xlsx"
 x = import_cpr(ff[1])
 x
 ```
