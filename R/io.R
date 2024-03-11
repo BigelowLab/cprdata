@@ -1,32 +1,178 @@
+# > glimpse(nfsc)
+# Rows: 2,755,662
+# Columns: 12
+# $ Cruise                      <chr> "EG7107", "EG7107", "EG…
+# $ Station                     <dbl> 43, 43, 43, 43, 43, 43,…
+# $ Year                        <dbl> 1971, 1971, 1971, 1971,…
+# $ Month                       <dbl> 11, 11, 11, 11, 11, 11,…
+# $ Day                         <dbl> 15, 15, 15, 15, 15, 15,…
+# $ Hour                        <dbl> 17, 17, 17, 17, 17, 17,…
+# $ Minute                      <dbl> 0, 0, 0, 0, 0, 0, 0, 0,…
+# $ `Latitude (degrees)`        <dbl> 39.6, 39.6, 39.6, 39.6,…
+# $ `Longitude (degrees)`       <dbl> 71.7666, 71.7666, 71.76…
+# $ `Phytoplankton Color Index` <dbl> 1, 1, 1, 1, 1, 1, 1, 1,…
+# $ name                        <chr> "Unidentified plankton …
+# $ abundance                   <dbl> 0, 0, 0, 0, 0, 0, 0, 0,…
+# 
+# > glimpse(gmri)
+# Rows: 2,941,544
+# Columns: 10
+# $ cruise          <chr> "EG6101", "EG6101", "EG6101", "EG61…
+# $ transect_number <dbl> 15, 15, 15, 15, 15, 15, 15, 15, 15,…
+# $ time            <dttm> 1961-07-16 04:00:00, 1961-07-16 04…
+# $ latitude        <dbl> 43.25, 43.25, 43.25, 43.25, 43.25, …
+# $ longitude       <dbl> 66, 66, 66, 66, 66, 66, 66, 66, 66,…
+# $ pci             <dbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,…
+# $ taxon           <chr> "Absent", "Acartia", "Acartia", "Ac…
+# $ taxon_stage     <chr> "unstaged", "adult", "copepodite i-…
+# $ aphia_id        <dbl> NaN, NaN, NaN, NaN, NaN, NaN, NaN, …
+# $ abundance       <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+
+
+#' Harmonize GMRI and NFSC CPR datasets
+#' 
+#' @export
+#' @param x long-form table of NFSC data
+#' @param y table of GMRI data
+#' @param is_zoo logical, if TRUE then account for taxon stage
+#' @return list of two tables with the same form, one for nfsc and gmri
+harmonize_cpr = function(x = read_nfsc_cpr(), 
+                         y = read_gmri_cpr(),
+                         is_zoo = "taxon_stage" %in% names(y)){
+  # source
+  # cruise
+  # station/transect
+  # time POSIXct
+  # lon
+  # lat
+  # pci
+  # name
+  # (stage if zooplankton)
+  # abundance
+  nms = c("source", "cruise", "station", "time", "lon", "lat", "pci", "abundance", "name")
+  if (is_zoo) nms = c(nms, "stage")
+  dt = sprintf("%0.4i-%0.2i-%0.2iT%0.2i:%0.2i:00", 
+               x$Year, x$Month, x$Day, x$Hour, x$Minute)
+  x = x |>
+    dplyr::mutate(source = "nfsc",
+                  time = as.POSIXct(dt, 
+                                    format = "%Y-%m-%dT%H:%M:%S", 
+                                    tz = "UTC")) |>
+    dplyr::rename(
+      cruise = "Cruise",
+      station = "Station",
+      pci = "Phytoplankton Color Index",
+      lat = "Latitude (degrees)",
+      lon = "Longitude (degrees)"
+    )
+  
+  
+  
+  y = y |>
+    dplyr::rename(
+      lat = "latitude",
+      lon = "longitude",
+      station = "transect_number",
+      name = "taxon" ) |>
+    dplyr::mutate(source = "gmri")
+  
+  if (is_zoo) {
+    x = nfsc_cpr_extract_stage(x) # dplyr::mutate(x, stage = NA_character_)
+    y = dplyr::rename(y, stage = "taxon_stage")
+  }
+  
+  dplyr::bind_rows(
+    dplyr::select(x, dplyr::all_of(nms)),
+    dplyr::select(y, dplyr::all_of(nms))
+  )
+  
+}
+
+#' Given a nfsc cpr table split name and stage
+#' 
+#' @export
+#' @param x table, the nfsc cpr data (long format)
+#' @return the tabkle with updated name and stage columns
+nfsc_cpr_extract_stage = function(x){
+  
+  dplyr::mutate(x,
+                stage = stringr::str_extract(.data$name, "(?<=\\[).+?(?=\\])"),
+                name = stringr::word(.data$name, 1, sep = "\\s\\["))
+} 
+
+
+#' Read NFSC data exported freom NFSC Excel spreadsheet
+#' 
+#' @export
+#' @param filename, the name of the file to read
+#' @return table of data
+read_nfsc_cpr = function(
+    filename = system.file("nfsc/2024-01-20_zooplankton.csv.gz",
+                           package = 'nfsccpr')){
+  readr::read_csv(filename, show_col_types = FALSE) |>
+    nfsc_cpr_to_long()
+}
+
+#' Read GMRI data downloaded by NERACOOS
+#' 
+#' @export
+#' @param filename, the name of the file to read
+#' @return table of data (with units as an attribute)
+read_gmri_cpr = function(
+    filename = system.file("gmri/2024-03-08_gom_cpr_zooplankton_full_bdeb_74de_8e13.csv.gz",
+                           package = 'nfsccpr')){
+  conn = gzfile(filename, open = "rt")
+  hdr = readLines(conn, n = 2)
+  col_names = strsplit(hdr[1], ",", fixed = TRUE)[[1]]
+  close(conn)
+  x = readr::read_csv(filename,
+                      skip = 2,
+                      col_names = col_names,
+                      show_col_types = FALSE)
+  attr(x, "units") <- strsplit(hdr[2], ",", fixed = TRUE)[[1]] 
+  x
+}
+
+
 #' Read zooplankton or phytoplankton CPR data
 #' 
 #' @export
 #' @param name chr, the name of the dataset to read (zooplankton or phytoplankton).
 #'   Can be shortened to "zoo" or "phyto".
-#' @param long logical, if TRUE pivot the data to long from
 #' @param form char, one of 'table' or 'sf' to determine the output form
 #' @return either a tibble or sf-table
 read_cpr = function(name = 'zooplankton',
-                    long = FALSE,
                     form = c("table", "sf")[1]){
   
-  path = system.file("nfsc", package = "nfsccpr")
+  if (FALSE){
+    name = 'zooplankton'
+    form = c("table", "sf")[1]
+  }
   
+  nfscpath = system.file("nfsc", package = "nfsccpr")
+  gmripath = system.file("gmri", package = "nfsccpr")
   most_recent_file = function(path,  pattern = "^.*_zooplankton\\.csv\\.gz$"){
     ff = list.files(path, pattern = pattern, full.names = TRUE)
     ff[[length(ff)]]
   }
   
+  
   filename = switch(substring(tolower(name[1]),1,1),
-    "z" = most_recent_file(path, pattern = "^.*_zooplankton\\.csv\\.gz$"),
-    "p" = most_recent_file(path, pattern = "^.*_phytoplankton\\.csv\\.gz$"),
+    "z" = most_recent_file(nfscpath, pattern = "^.*_zooplankton\\.csv\\.gz$"),
+    "p" = most_recent_file(nfscpath, pattern = "^.*_phytoplankton\\.csv\\.gz$"),
     stop("name not known:", name[1]))
   
-  x = readr::read_csv(filename, show_col_types = FALSE)
+  nfsc = read_nfsc_cpr(filename)
   
-  if (long){
-    x = cpr_to_long(x)
-  }
+  filename = switch(substring(tolower(name[1]),1,1),
+                    "z" = most_recent_file(gmripath, pattern = "^.*zooplankton.*\\.csv\\.gz$"),
+                    "p" = most_recent_file(gmripath, pattern = "^.*phytoplankton.*\\.csv\\.gz$"),
+                    stop("name not known:", name[1]))
+  
+  gmri = read_gmri_cpr(filename)
+  
+  x = harmonize_cpr(nfsc, gmri)
+  
   
   if (tolower(form[1]) == "sf"){
     x = cpr_as_sf(x)
@@ -40,7 +186,7 @@ read_cpr = function(name = 'zooplankton',
 #' @export
 #' @param x tibble of data
 #' @return long-form tibble of data
-cpr_to_long = function(x,
+nfsc_cpr_to_long = function(x,
                        retain_col = "Phytoplankton Color Index"){
   
   ix = which(names(x) == retain_col[1])
@@ -59,9 +205,9 @@ cpr_to_long = function(x,
 #' @param crs crs to assign during transform
 #' @return sf class POINT
 cpr_as_sf = function(x,
-                     coords = c("Longitude (degrees)", "Latitude (degrees)"), 
+                     coords = c("lon", "lat"), 
                      crs = 4326){
-  sf::st_as_sf(x, coords = c("Longitude (degrees)", "Latitude (degrees)"), crs = 4326)
+  sf::st_as_sf(x, coords = coords, crs = crs)
 }
 
 

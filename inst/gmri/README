@@ -1,0 +1,14 @@
+These files were downloaded 2024-03-08 by btupper at the following addresses...
+
+https://www.neracoos.org/erddap/tabledap/gom_cpr_phytoplankton_full.html
+
+https://www.neracoos.org/erddap/tabledap/gom_cpr_zooplankton_full.html
+
+
+We selected all variables for all records and downlaoded as CSV with the following links...
+
+http://www.neracoos.org/erddap/tabledap/gom_cpr_phytoplankton_full.csv?cruise%2Ctransect_number%2Ctime%2Clatitude%2Clongitude%2Cpci%2Ctaxon%2Caphia_id%2Cabundance
+
+http://www.neracoos.org/erddap/tabledap/gom_cpr_zooplankton_full.csv?cruise%2Ctransect_number%2Ctime%2Clatitude%2Clongitude%2Cpci%2Ctaxon%2Ctaxon_stage%2Caphia_id%2Cabundance
+
+The filenames were prepended with the download data and then gzipped.

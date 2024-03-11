@@ -4,11 +4,7 @@
 \alias{cpr_as_sf}
 \title{Convert CPR data to sf}
 \usage{
-cpr_as_sf(
-  x,
-  coords = c("Longitude (degrees)", "Latitude (degrees)"),
-  crs = 4326
-)
+cpr_as_sf(x, coords = c("lon", "lat"), crs = 4326)
 }
 \arguments{
 \item{x}{tibble of data}

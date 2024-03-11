@@ -4,13 +4,11 @@
 \alias{read_cpr}
 \title{Read zooplankton or phytoplankton CPR data}
 \usage{
-read_cpr(name = "zooplankton", long = FALSE, form = c("table", "sf")[1])
+read_cpr(name = "zooplankton", form = c("table", "sf")[1])
 }
 \arguments{
 \item{name}{chr, the name of the dataset to read (zooplankton or phytoplankton).
 Can be shortened to "zoo" or "phyto".}
-
-\item{long}{logical, if TRUE pivot the data to long from}
 
 \item{form}{char, one of 'table' or 'sf' to determine the output form}
 }

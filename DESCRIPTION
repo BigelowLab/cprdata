@@ -16,4 +16,5 @@ Imports:
   readr, 
   sf,
   tidyr,
+  stringr,
   dplyr
