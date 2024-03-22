@@ -46,14 +46,14 @@ x = read_cpr(name = "zooplankton",  form = "sf") |>
   dplyr::glimpse() 
 ```
 
+#### Plot points
 
-### Import a raw data file
-The NFSC data were shared as a large two-sheet Excel document. It's difficult to know if the format of the raw data file will remain as that distributed in January 2024.  Importing the one we were provided is encoded in a package function.  The package can be adapted for other formats but may require a small effort in adapting the code.
-
-```{r}
-ff = "/Users/ben/Library/CloudStorage/Dropbox/data/noaa/nmfs/cpr/MAB CPR (Jan 20, 2024 update).xlsx"
-x = import_cpr(ff[1])
-x
+```{r, message=FALSE, warning=FALSE}
+suppressPackageStartupMessages({
+  library(sf)
+  library(rnaturalearth)
+})
+coast = ne_coastline(scale = 110, returnclass = "sf")
+plot(st_geometry(coast), extent = x, axes = TRUE)
+plot(st_geometry(x), pch = ".", col = "orange", add = TRUE)
 ```
-
-THe GMRI data files are formatted in long CSV files.

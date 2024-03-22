@@ -80,62 +80,16 @@ x = read_cpr(name = "zooplankton",  form = "sf") |>
     ## $ stage     <chr> "unstaged", "nauplius", "copepodite V", "PARVA (POSTLARVA)",…
     ## $ geometry  <POINT [°]> POINT (71.7666 39.6), POINT (71.7666 39.6), POINT (71.…
 
-### Import a raw data file
-
-The NFSC data were shared as a large two-sheet Excel document. It’s
-difficult to know if the format of the raw data file will remain as that
-distributed in January 2024. Importing the one we were provided is
-encoded in a package function. The package can be adapted for other
-formats but may require a small effort in adapting the code.
+#### Plot points
 
 ``` r
-ff = "/Users/ben/Library/CloudStorage/Dropbox/data/noaa/nmfs/cpr/MAB CPR (Jan 20, 2024 update).xlsx"
-x = import_cpr(ff[1])
-x
+suppressPackageStartupMessages({
+  library(sf)
+  library(rnaturalearth)
+})
+coast = ne_coastline(scale = 110, returnclass = "sf")
+plot(st_geometry(coast), extent = x, axes = TRUE)
+plot(st_geometry(x), pch = ".", col = "orange", add = TRUE)
 ```
 
-    ## $Zooplankton
-    ## # A tibble: 4,459 × 628
-    ##    Cruise Station  Year Month   Day  Hour Minute `Latitude (degrees)`
-    ##    <chr>    <dbl> <dbl> <dbl> <dbl> <dbl>  <dbl>                <dbl>
-    ##  1 EG7107      43  1971    11    15    17      0                 39.6
-    ##  2 EG7107      45  1971    11    15    17      0                 39.5
-    ##  3 EG7108      25  1971    12    15     5      0                 39.3
-    ##  4 EG7108      27  1971    12    15     5      0                 39.2
-    ##  5 EG7108      29  1971    12    15     5      0                 39.0
-    ##  6 EG7108      31  1971    12    15    17      0                 38.8
-    ##  7 AL7206      11  1972     8    19    21     23                 39.3
-    ##  8 AL7206      13  1972     8    19    19     44                 39.0
-    ##  9 AL7206      15  1972     8    19    18      5                 38.6
-    ## 10 AL7206      19  1972     8    19    14     17                 38.0
-    ## # ℹ 4,449 more rows
-    ## # ℹ 620 more variables: `Longitude (degrees)` <dbl>,
-    ## #   `Phytoplankton Color Index` <dbl>,
-    ## #   `Unidentified plankton and fragments [unstaged] [2.999]` <dbl>,
-    ## #   `Copepoda [nauplius] [100.13]` <dbl>,
-    ## #   `Copepoda [copepodite V] [100.24]` <dbl>,
-    ## #   `Copepoda [PARVA (POSTLARVA)] [100.37]` <dbl>, …
-    ## 
-    ## $Phytoplankton
-    ## # A tibble: 4,459 × 186
-    ##    Cruise Station  Year Month   Day  Hour Minute `Latitude (degrees)`
-    ##    <chr>    <dbl> <dbl> <dbl> <dbl> <dbl>  <dbl>                <dbl>
-    ##  1 EG7107      43  1971    11    15    17      0                 39.6
-    ##  2 EG7107      45  1971    11    15    17      0                 39.5
-    ##  3 EG7108      25  1971    12    15     5      0                 39.3
-    ##  4 EG7108      27  1971    12    15     5      0                 39.2
-    ##  5 EG7108      29  1971    12    15     5      0                 39.0
-    ##  6 EG7108      31  1971    12    15    17      0                 38.8
-    ##  7 AL7206      11  1972     8    19    21     23                 39.3
-    ##  8 AL7206      13  1972     8    19    19     44                 39.0
-    ##  9 AL7206      15  1972     8    19    18      5                 38.6
-    ## 10 AL7206      19  1972     8    19    14     17                 38.0
-    ## # ℹ 4,449 more rows
-    ## # ℹ 178 more variables: `Longitude (degrees)` <dbl>,
-    ## #   `Phytoplankton Color Index` <dbl>, `Paralia sulcata [9000]` <dbl>,
-    ## #   `Skeletonima costatum [9001]` <dbl>, `Thalassiosira [9002]` <dbl>,
-    ## #   `Coscinodiscus [9003]` <dbl>, `Corethron criophilum [9004]` <dbl>,
-    ## #   `Dactyliosolen antarcticus [9005]` <dbl>,
-    ## #   `Leptocylindrus mediterraneus [9006]` <dbl>, …
-
-THe GMRI data files are formatted in long CSV files.
+![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
