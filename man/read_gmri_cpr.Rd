@@ -7,11 +7,14 @@
 read_gmri_cpr(
   filename =
     system.file("gmri/2024-03-08_gom_cpr_zooplankton_full_bdeb_74de_8e13.csv.gz", package
-    = "nfsccpr")
+    = "nfsccpr"),
+  repair_longitude = TRUE
 )
 }
 \arguments{
 \item{filename, }{the name of the file to read}
+
+\item{repair_longitude}{logi, if TRUE then make all longitudes negative}
 }
 \value{
 table of data (with units as an attribute)

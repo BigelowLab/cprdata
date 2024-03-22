@@ -1,11 +1,11 @@
-Package: nfsccpr
+Package: cprdata
 Type: Package
 Title: Continuous Plankton Recorder
 Version: 0.1.0
 Author: Ben Tupper
 Maintainer: Ben Tupper <btupper@bigelow.org>
-URL: https://github.com/bigelowlab/nefsc-cpr
-Description: R language package to assist with access to NFSC CPR data.
+URL: https://github.com/bigelowlab/cprdata
+Description: R language package to assist with access to CPR data.
 License: MIT + file LICENSE
 Encoding: UTF-8
 RoxygenNote: 7.2.3

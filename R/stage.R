@@ -37,7 +37,7 @@ make_stage_lut = function(x = read_cpr("zooplankton",
                                  composite = FALSE,
                                  clean = FALSE)){
   
-  lut = dplyr::count(x, stage) |>
+  lut = dplyr::count(x, dplyr::all_of("stage")) |>
     dplyr::mutate(newname = stage_clean(.data$stage))
   
   lut

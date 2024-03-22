@@ -1,4 +1,4 @@
-NFSC-CPR
+cprdata
 ================
 
 This R package facilitates access and analysis of
@@ -28,7 +28,7 @@ tables](https://r-spatial.github.io/sf/).
 
 ## Installation
 
-    remotes::install_github("BigelowLab/nfsccrp")
+    remotes::install_github("BigelowLab/cprdata")
 
 ## Usage
 
@@ -38,30 +38,32 @@ The dataset contains both zooplankton and phytoplankton data from the
 Mid-Atlantic Bight and Gulf of Maine regions. We regularily access to
 the zooplankton data, but it is easy to switch to phytoplankton. We can
 read the data in its “raw” state as a simple table or transformed into a
-[sf]() POINT table.
+[sf](https://r-spatial.github.io/sf/) POINT table.
 
 #### Read as a wide table
 
 ``` r
-library(nfsccpr)
-x = read_cpr(name = "zooplankton", form = "table") |>
+library(cprdata)
+x = read_cpr(name = "phytoplankton", form = "table") |>
   dplyr::glimpse()
 ```
 
-    ## Rows: 5,697,206
-    ## Columns: 10
+    ## Rows: 1,649,128
+    ## Columns: 9
     ## $ source    <chr> "nfsc", "nfsc", "nfsc", "nfsc", "nfsc", "nfsc", "nfsc", "nfs…
     ## $ cruise    <chr> "EG7107", "EG7107", "EG7107", "EG7107", "EG7107", "EG7107", …
     ## $ station   <dbl> 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, …
     ## $ time      <dttm> 1971-11-15 17:00:00, 1971-11-15 17:00:00, 1971-11-15 17:00:…
-    ## $ lon       <dbl> 71.7666, 71.7666, 71.7666, 71.7666, 71.7666, 71.7666, 71.766…
+    ## $ lon       <dbl> -71.7666, -71.7666, -71.7666, -71.7666, -71.7666, -71.7666, …
     ## $ lat       <dbl> 39.6, 39.6, 39.6, 39.6, 39.6, 39.6, 39.6, 39.6, 39.6, 39.6, …
     ## $ pci       <dbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
-    ## $ abundance <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
-    ## $ name      <chr> "Unidentified plankton and fragments", "Copepoda", "Copepoda…
-    ## $ stage     <chr> "unstaged", "nauplius", "copepodite V", "PARVA (POSTLARVA)",…
+    ## $ abundance <dbl> 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, …
+    ## $ name      <chr> "Paralia sulcata [9000]", "Skeletonima costatum [9001]", "Th…
 
 #### Read as a sf POINT table
+
+Note that we switch to reading zooplankton data and add a `stage`
+variable.
 
 ``` r
 x = read_cpr(name = "zooplankton",  form = "sf") |>
@@ -77,8 +79,8 @@ x = read_cpr(name = "zooplankton",  form = "sf") |>
     ## $ pci       <dbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
     ## $ abundance <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
     ## $ name      <chr> "Unidentified plankton and fragments", "Copepoda", "Copepoda…
-    ## $ stage     <chr> "unstaged", "nauplius", "copepodite V", "PARVA (POSTLARVA)",…
-    ## $ geometry  <POINT [°]> POINT (71.7666 39.6), POINT (71.7666 39.6), POINT (71.…
+    ## $ stage     <chr> "unstaged", "nauplius", "copepodite v", "parva (postlarva)",…
+    ## $ geometry  <POINT [°]> POINT (-71.7666 39.6), POINT (-71.7666 39.6), POINT (-…
 
 #### Plot points
 
@@ -87,7 +89,7 @@ suppressPackageStartupMessages({
   library(sf)
   library(rnaturalearth)
 })
-coast = ne_coastline(scale = 110, returnclass = "sf")
+coast = ne_coastline(scale = "medium", returnclass = "sf")
 plot(st_geometry(coast), extent = x, axes = TRUE)
 plot(st_geometry(x), pch = ".", col = "orange", add = TRUE)
 ```

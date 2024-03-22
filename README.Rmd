@@ -1,5 +1,5 @@
 ---
-title: "NFSC-CPR"
+title: "cprdata"
 output: github_document
 ---
 
@@ -23,24 +23,27 @@ This R package facilitates access and analysis of [NFSC](https://www.fisheries.n
 ## Installation
 
 ```
-remotes::install_github("BigelowLab/nfsccrp")
+remotes::install_github("BigelowLab/cprdata")
 ```
 
 ## Usage
 
 ### Read the data
 
-The dataset contains both zooplankton and phytoplankton data from the Mid-Atlantic Bight and Gulf of Maine regions.  We regularily access to the zooplankton data, but it is easy to switch to phytoplankton.  We can read the data in its "raw" state as a simple table or transformed into a [sf]() POINT table.
+The dataset contains both zooplankton and phytoplankton data from the Mid-Atlantic Bight and Gulf of Maine regions.  We regularily access to the zooplankton data, but it is easy to switch to phytoplankton.  We can read the data in its "raw" state as a simple table or transformed into a [sf](https://r-spatial.github.io/sf/) POINT table.
 
 ####  Read as a wide table
 ```{r}
-library(nfsccpr)
-x = read_cpr(name = "zooplankton", form = "table") |>
+library(cprdata)
+x = read_cpr(name = "phytoplankton", form = "table") |>
   dplyr::glimpse()
 ```
 
 
 #### Read as a sf POINT table
+
+Note that we switch to reading zooplankton data and add a `stage` variable.
+
 ```{r}
 x = read_cpr(name = "zooplankton",  form = "sf") |>
   dplyr::glimpse() 
@@ -53,7 +56,7 @@ suppressPackageStartupMessages({
   library(sf)
   library(rnaturalearth)
 })
-coast = ne_coastline(scale = 110, returnclass = "sf")
+coast = ne_coastline(scale = "medium", returnclass = "sf")
 plot(st_geometry(coast), extent = x, axes = TRUE)
 plot(st_geometry(x), pch = ".", col = "orange", add = TRUE)
 ```

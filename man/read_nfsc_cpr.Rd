@@ -5,11 +5,14 @@
 \title{Read NFSC data exported freom NFSC Excel spreadsheet}
 \usage{
 read_nfsc_cpr(
-  filename = system.file("nfsc/2024-01-20_zooplankton.csv.gz", package = "nfsccpr")
+  filename = system.file("nfsc/2024-01-20_zooplankton.csv.gz", package = "nfsccpr"),
+  repair_longitude = TRUE
 )
 }
 \arguments{
 \item{filename, }{the name of the file to read}
+
+\item{repair_longitude}{logi, if TRUE then make all longitudes negative}
 }
 \value{
 table of data

@@ -8,6 +8,9 @@ nfsc_cpr_to_long(x, retain_col = "Phytoplankton Color Index")
 }
 \arguments{
 \item{x}{tibble of data}
+
+\item{retain_col}{char, the name of the column signaling the start
+of the columns to pivot}
 }
 \value{
 long-form tibble of data

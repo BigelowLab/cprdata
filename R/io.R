@@ -105,22 +105,28 @@ nfsc_cpr_extract_stage = function(x){
 #' 
 #' @export
 #' @param filename, the name of the file to read
+#' @param repair_longitude logi, if TRUE then make all longitudes negative
 #' @return table of data
 read_nfsc_cpr = function(
     filename = system.file("nfsc/2024-01-20_zooplankton.csv.gz",
-                           package = 'nfsccpr')){
-  readr::read_csv(filename, show_col_types = FALSE) |>
+                           package = 'nfsccpr'),
+    repair_longitude = TRUE){
+  x = readr::read_csv(filename, show_col_types = FALSE) |>
     nfsc_cpr_to_long()
+  if (repair_longitude) x[["Longitude (degrees)"]] =  0.0 - abs(x[["Longitude (degrees)"]])
+  x
 }
 
 #' Read GMRI data downloaded by NERACOOS
 #' 
 #' @export
 #' @param filename, the name of the file to read
+#' @param repair_longitude logi, if TRUE then make all longitudes negative
 #' @return table of data (with units as an attribute)
 read_gmri_cpr = function(
     filename = system.file("gmri/2024-03-08_gom_cpr_zooplankton_full_bdeb_74de_8e13.csv.gz",
-                           package = 'nfsccpr')){
+                           package = 'nfsccpr'),
+    repair_longitude = TRUE){
   conn = gzfile(filename, open = "rt")
   hdr = readLines(conn, n = 2)
   col_names = strsplit(hdr[1], ",", fixed = TRUE)[[1]]
@@ -129,6 +135,7 @@ read_gmri_cpr = function(
                       skip = 2,
                       col_names = col_names,
                       show_col_types = FALSE)
+  if (repair_longitude) x[["longitude"]] =  0.0 - abs(x[["longitude"]])
   attr(x, "units") <- strsplit(hdr[2], ",", fixed = TRUE)[[1]] 
   x
 }
@@ -238,6 +245,8 @@ write_composite = function(x = read_cpr("zooplankton",
 #' 
 #' @export
 #' @param x tibble of data
+#' @param retain_col char, the name of the column signaling the start
+#'   of the columns to pivot
 #' @return long-form tibble of data
 nfsc_cpr_to_long = function(x,
                        retain_col = "Phytoplankton Color Index"){
