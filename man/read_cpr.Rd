@@ -4,13 +4,24 @@
 \alias{read_cpr}
 \title{Read zooplankton or phytoplankton CPR data}
 \usage{
-read_cpr(name = "zooplankton", form = c("table", "sf")[1])
+read_cpr(
+  name = "zooplankton",
+  form = c("table", "sf")[1],
+  composite = TRUE,
+  clean = !composite
+)
 }
 \arguments{
 \item{name}{chr, the name of the dataset to read (zooplankton or phytoplankton).
 Can be shortened to "zoo" or "phyto".}
 
 \item{form}{char, one of 'table' or 'sf' to determine the output form}
+
+\item{composite}{logical, if TRUE read the composite (merged and
+simplified) dataset.}
+
+\item{clean}{logical, if TRUE then try to clean up the name and stage (if present)
+variable(s).}
 }
 \value{
 either a tibble or sf-table

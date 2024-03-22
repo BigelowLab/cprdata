@@ -134,45 +134,82 @@ read_gmri_cpr = function(
 }
 
 
+
+
+
 #' Read zooplankton or phytoplankton CPR data
 #' 
 #' @export
 #' @param name chr, the name of the dataset to read (zooplankton or phytoplankton).
 #'   Can be shortened to "zoo" or "phyto".
 #' @param form char, one of 'table' or 'sf' to determine the output form
+#' @param composite logical, if TRUE read the composite (merged and 
+#' simplified) dataset.
+#' @param clean logical, if TRUE then try to clean up the name and stage (if present)
+#'   variable(s).
 #' @return either a tibble or sf-table
 read_cpr = function(name = 'zooplankton',
-                    form = c("table", "sf")[1]){
+                    form = c("table", "sf")[1],
+                    composite = TRUE,
+                    clean = !composite){
   
   if (FALSE){
-    name = 'zooplankton'
+    name = c('zooplankton',  "phytoplankton")[1]
     form = c("table", "sf")[1]
+    composite = FALSE # TRUE
+    clean = TRUE
   }
   
-  nfscpath = system.file("nfsc", package = "nfsccpr")
-  gmripath = system.file("gmri", package = "nfsccpr")
   most_recent_file = function(path,  pattern = "^.*_zooplankton\\.csv\\.gz$"){
     ff = list.files(path, pattern = pattern, full.names = TRUE)
     ff[[length(ff)]]
   }
   
   
-  filename = switch(substring(tolower(name[1]),1,1),
-    "z" = most_recent_file(nfscpath, pattern = "^.*_zooplankton\\.csv\\.gz$"),
-    "p" = most_recent_file(nfscpath, pattern = "^.*_phytoplankton\\.csv\\.gz$"),
-    stop("name not known:", name[1]))
-  
-  nfsc = read_nfsc_cpr(filename)
-  
-  filename = switch(substring(tolower(name[1]),1,1),
-                    "z" = most_recent_file(gmripath, pattern = "^.*zooplankton.*\\.csv\\.gz$"),
-                    "p" = most_recent_file(gmripath, pattern = "^.*phytoplankton.*\\.csv\\.gz$"),
-                    stop("name not known:", name[1]))
-  
-  gmri = read_gmri_cpr(filename)
-  
-  x = harmonize_cpr(nfsc, gmri)
-  
+  if (composite){
+    
+    path = system.file("composite", package = "nfsccpr")
+    filename = switch(substring(tolower(name[1]),1,1),
+                      "z" = most_recent_file(path, pattern = "^.*zooplankton.*\\.rds$"),
+                      "p" = most_recent_file(path, pattern = "^.*phytoplankton.*\\.rds$"),
+                      stop("name not known:", name[1]))
+    x = readRDS(filename)
+    
+  } else {
+    
+    nfscpath = system.file("nfsc", package = "nfsccpr")
+    gmripath = system.file("gmri", package = "nfsccpr")
+    
+    filename = switch(substring(tolower(name[1]),1,1),
+      "z" = most_recent_file(nfscpath, pattern = "^.*_zooplankton\\.csv\\.gz$"),
+      "p" = most_recent_file(nfscpath, pattern = "^.*_phytoplankton\\.csv\\.gz$"),
+      stop("name not known:", name[1]))
+    
+    nfsc = read_nfsc_cpr(filename)
+    
+    filename = switch(substring(tolower(name[1]),1,1),
+                      "z" = most_recent_file(gmripath, pattern = "^.*zooplankton.*\\.csv\\.gz$"),
+                      "p" = most_recent_file(gmripath, pattern = "^.*phytoplankton.*\\.csv\\.gz$"),
+                      stop("name not known:", name[1]))
+    
+    gmri = read_gmri_cpr(filename)
+    
+    x = harmonize_cpr(nfsc, gmri)
+    
+    if (clean){
+      # strip leading/trailing spaces and reduce inners to just one
+      # first cap others lower case
+      x = dplyr::mutate(x, 
+        name = stringr::str_squish(.data$name) |>
+          stringr::str_to_sentence())
+      if ("stage" %in% colnames(x)){
+          # all lower case
+        x = dplyr::mutate(x,
+          stage = stage_clean(.data$stage) |> recode_stage() )
+      } # stage?
+    } # clean?
+    
+  }
   
   if (tolower(form[1]) == "sf"){
     x = cpr_as_sf(x)
@@ -180,6 +217,22 @@ read_cpr = function(name = 'zooplankton',
   
   x
 }
+
+# a private function for the developer
+write_composite = function(x = read_cpr("zooplankton", 
+                                        composite = FALSE, 
+                                        clean = TRUE)){
+  if ("stage" %in% colnames(x)){
+    filename = sprintf("inst/composite/%s_zooplankton.rds", 
+                       format(Sys.Date(), "%Y-%m-%d"))
+  } else {
+    filename = filename = sprintf("inst/composite/%s_phytoplankton.rds", 
+                                  format(Sys.Date(), "%Y-%m-%d"))
+  }
+  saveRDS(x, filename)
+  x
+}
+
 
 #' Pivot CPR data to long form
 #' 
