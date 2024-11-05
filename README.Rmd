@@ -33,7 +33,7 @@ remotes::install_github("BigelowLab/cprdata")
 The data set contains both zooplankton and phytoplankton data from the Mid-Atlantic Bight and Gulf of Maine regions.  We regularly access to the zooplankton data, but it is easy to switch to phytoplankton.  We can read the data in its "raw" state as a simple table or transformed into a [sf](https://r-spatial.github.io/sf/) POINT table.
 
 ####  Read as a wide table
-```{r}
+```{r read_phyto}
 library(cprdata)
 x = read_cpr(name = "phytoplankton", form = "table") |>
   dplyr::glimpse()
@@ -44,14 +44,14 @@ x = read_cpr(name = "phytoplankton", form = "table") |>
 
 Note that we switch to reading zooplankton data and add a `stage` variable.
 
-```{r}
+```{r read_zoop}
 x = read_cpr(name = "zooplankton",  form = "sf") |>
   dplyr::glimpse() 
 ```
 
 #### Plot points
 
-```{r, message=FALSE, warning=FALSE}
+```{r plot_zoop, message=FALSE, warning=FALSE}
 suppressPackageStartupMessages({
   library(sf)
   library(rnaturalearth)
