@@ -7,7 +7,7 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-This R package facilitates access and analysis of [NFSC](https://www.fisheries.noaa.gov/about/northeast-fisheries-science-center) [Continuous Plankton Recorder](https://en.wikipedia.org/wiki/Continuous_Plankton_Recorder) (CPR) data.  Data can imported from distrubuted [Excel](https://en.wikipedia.org/wiki/Microsoft_Excel) spreadsheets into data frames, [tibbles](https://tibble.tidyverse.org/) or [sf tables](https://r-spatial.github.io/sf/).
+This R package facilitates access and analysis of [NFSC](https://www.fisheries.noaa.gov/about/northeast-fisheries-science-center) [Continuous Plankton Recorder](https://en.wikipedia.org/wiki/Continuous_Plankton_Recorder) (CPR) data.  Data can imported from distributed [Excel](https://en.wikipedia.org/wiki/Microsoft_Excel) spreadsheets into data frames, [tibbles](https://tibble.tidyverse.org/) or [sf tables](https://r-spatial.github.io/sf/).
 
 >Part of this dataset was obtained from [NOAA's NFSC](https://www.fisheries.noaa.gov/about/northeast-fisheries-science-center) on 20 January 2024 and might not represent the most up to date data. Please contact NOAA directly for the most recent data. The balance of this dataset is avaiable from the [NERACOOS ERDDAP server](https://www.neracoos.org/erddap/index.html).
 
@@ -30,7 +30,7 @@ remotes::install_github("BigelowLab/cprdata")
 
 ### Read the data
 
-The dataset contains both zooplankton and phytoplankton data from the Mid-Atlantic Bight and Gulf of Maine regions.  We regularily access to the zooplankton data, but it is easy to switch to phytoplankton.  We can read the data in its "raw" state as a simple table or transformed into a [sf](https://r-spatial.github.io/sf/) POINT table.
+The data set contains both zooplankton and phytoplankton data from the Mid-Atlantic Bight and Gulf of Maine regions.  We regularly access to the zooplankton data, but it is easy to switch to phytoplankton.  We can read the data in its "raw" state as a simple table or transformed into a [sf](https://r-spatial.github.io/sf/) POINT table.
 
 ####  Read as a wide table
 ```{r}

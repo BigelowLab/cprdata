@@ -5,7 +5,7 @@ This R package facilitates access and analysis of
 [NFSC](https://www.fisheries.noaa.gov/about/northeast-fisheries-science-center)
 [Continuous Plankton
 Recorder](https://en.wikipedia.org/wiki/Continuous_Plankton_Recorder)
-(CPR) data. Data can imported from distrubuted
+(CPR) data. Data can imported from distributed
 [Excel](https://en.wikipedia.org/wiki/Microsoft_Excel) spreadsheets into
 data frames, [tibbles](https://tibble.tidyverse.org/) or [sf
 tables](https://r-spatial.github.io/sf/).
@@ -34,10 +34,10 @@ tables](https://r-spatial.github.io/sf/).
 
 ### Read the data
 
-The dataset contains both zooplankton and phytoplankton data from the
-Mid-Atlantic Bight and Gulf of Maine regions. We regularily access to
-the zooplankton data, but it is easy to switch to phytoplankton. We can
-read the data in its “raw” state as a simple table or transformed into a
+The data set contains both zooplankton and phytoplankton data from the
+Mid-Atlantic Bight and Gulf of Maine regions. We regularly access to the
+zooplankton data, but it is easy to switch to phytoplankton. We can read
+the data in its “raw” state as a simple table or transformed into a
 [sf](https://r-spatial.github.io/sf/) POINT table.
 
 #### Read as a wide table
@@ -94,4 +94,4 @@ plot(st_geometry(coast), extent = x, axes = TRUE)
 plot(st_geometry(x), pch = ".", col = "orange", add = TRUE)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+![](README_files/figure-gfm/plot_zoop-1.png)<!-- -->

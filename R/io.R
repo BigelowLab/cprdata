@@ -161,7 +161,7 @@ read_cpr = function(name = 'zooplankton',
                     clean = !composite){
   
   if (FALSE){
-    name = c('zooplankton',  "phytoplankton")[1]
+    name = c('zooplankton',  "phytoplankton")[2]
     form = c("table", "sf")[1]
     composite = FALSE # TRUE
     clean = TRUE
@@ -175,7 +175,7 @@ read_cpr = function(name = 'zooplankton',
   
   if (composite){
     
-    path = system.file("composite", package = "nfsccpr")
+    path = system.file("composite", package = "cprdata")
     filename = switch(substring(tolower(name[1]),1,1),
                       "z" = most_recent_file(path, pattern = "^.*zooplankton.*\\.rds$"),
                       "p" = most_recent_file(path, pattern = "^.*phytoplankton.*\\.rds$"),
